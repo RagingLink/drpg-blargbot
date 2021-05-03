@@ -104,7 +104,7 @@ fields.name:Level;
 fields.value:{get;~userlvl};
 fields.inline:true;
 fields.name:XP;
-fields.value:{numformat;{get;~userXP};;;,} / {numformat;{get;~requiredXP};;;,} ( {numformat;{math;-;{get;~requiredXP};{get;~userXP}};;;,} XP left );
+fields.value:{numformat;{get;~userXP};;;,} / {numformat;{get;~requiredXP};;;,} ( **{numformat;{math;-;{get;~requiredXP};{get;~userXP}};;;,} XP left** );
 fields.inline:true;
 image.url:{exec;progressbar;{get;~percent};-c;{exec;dcolor;{get;~user}}};
 color:{exec;dcolor;{get;~user}};
