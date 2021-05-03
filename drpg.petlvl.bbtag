@@ -1,0 +1,81 @@
+{if;{args};==;help;
+    {embed;{buildembed;
+        title:Help for drpg pet;
+        description:{unindent;
+            This tag allows you to display the level your or someone else's pet.
+            Inspired by `b!t petlvl` and made by RagingLink#9469
+        };
+        fields.name:Usage;
+        fields.value:`b!t drpg pet [user]`, where `[user]` can be a username, id or mention.;
+        color:{exec;dcolor}
+    }}
+    {return;false}
+}
+
+{suppresslookup}
+{set;~user;{userid}}
+
+{if;{argslength};!=;0;
+  {set;~user;{userid;{args}}}
+  {if;{get;~user};==;;Not a valid user. Try
+`{prefix}t drpg pet` for your own pets' info.
+`{prefix}t drpg pet [any username/userID]` for someone else's pets' info.
+For example `{prefix}t drpg pet {username}` or `{prefix}t drpg {userid}` will display your own pets' info, just switch those with whatever username/userID you wanna see.
+{return;false}}
+}
+
+{set;~api-url;https://api.discorddungeons.me/v3}
+{set;~api-key;{get;@drpg.level-key}}
+{set;~options;
+  {inject;{lb}json{semi}
+    {lb}
+      "method" : "GET",
+      "headers" : {lb}
+        "Authorization" : "{get;~api-key}"
+      {rb}
+    {rb}
+  {rb}
+}}
+{set;~outputID;{output;Loading pet records{exec;loading;11}}}
+
+{set;~body;{jget;{request;{get;~api-url}/user/{get;~user};{get;~options}};body}}
+{if;{jget;~body;data};==;;
+  {edit;{channelid};{get;~outputID};I don't know anything about {username;{get;~user}}...}
+  {return;false}
+}
+
+{set;~plvl;{jget;{get;~body};data.pet.level}}
+{set;~pxp;{jget;{get;~body};data.pet.xp}}
+{set;~pname;{jget;{get;~body};data.pet.name}}
+{if;{jget;~body;data.pet.image};!=;;
+    {set;~pimg;{jget;~body;data.pet.image}}
+;
+    {set;~pimg;https://api.nicelink.xyz/jimp/59dd74e3-beb6-4cc4-97dd-317cf9b9172f.png}
+}
+{function;getBase;{if;{logic;&&;{bool;>=;{get;~plvl};5};{bool;<=;{get;~plvl};29}};==;true;{set;~base;35};{if;{logic;&&;{bool;>=;{get;~plvl};30};{bool;<=;{get;~plvl};44}};==;true;{set;~base;45};{if;{logic;&&;{bool;>=;{get;~plvl};45};{bool;<=;{get;~plvl};89}};==;true;{set;~base;55};{if;{logic;&&;{bool;>=;{get;~plvl};90};{bool;<=;{get;~plvl};99}};==;true;{set;~base;70};{if;{logic;&&;{bool;>=;{get;~plvl};100};{bool;<=;{get;~plvl};149}};==;true;{set;~base;95};{if;{logic;&&;{bool;>=;{get;~plvl};150};{bool;<=;{get;~plvl};199}};==;true;{set;~base;120};{if;{logic;&&;{bool;>=;{get;~plvl};200};{bool;<=;{get;~plvl};299}};==;true;{set;~base;145};{if;{logic;&&;{bool;>=;{get;~plvl};300};{bool;<=;{get;~plvl};499}};==;true;{set;~base;170};{if;{logic;&&;{bool;>=;{get;~plvl};500};{bool;<=;{get;~plvl};599}};==;true;{set;~base;195};{set;~base;220}}}}}}}}}}}
+{set;~base;20}
+
+{func.getBase}
+{set;~currentbase;{math;*;{get;~base};{get;~plvl};{math;+;{get;~plvl};1}}}
+{void;{decrement;~plvl}}
+
+{func.getBase}
+{set;~lastbase;{math;*;{get;~base};{get;~plvl};{math;+;{get;~plvl};1}}}
+{void;{increment;~plvl}}
+{set;~percent;{numformat;{math;*;{math;/;{math;-;{get;~pxp};{get;~lastbase}};{math;-;{get;~currentbase};{get;~lastbase}}};100};5}}
+{set;~percent;{min;100;{max;0;{get;~percent}}}}
+
+{edit;{channelid};{get;~outputID};{space};{embedbuild;
+title:Pet level of {username;{get;~user}}#{userdiscrim;{get;~user}};
+author.icon_url:{get;~pimg};
+author.name:{get;~pname};
+color:{exec;dcolor;{get;~user}};
+description:{repeat;`;3}md
+# Level of {get;~pname}
+{get;~plvl}
+> - <
+# XP
+{numformat;{get;~pxp};;;,} / {numformat;{get;~currentbase};;;,} ( {numformat;{math;-;{get;~currentbase};{get;~pxp}};;;,} XP left){repeat;`;3};
+image.url:{exec;progressbar;{get;~percent};-c;{exec;dcolor;{get;~user}}};
+footer.text:{numformat;{get;~percent};2}%
+}}
