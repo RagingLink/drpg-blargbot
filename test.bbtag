@@ -1,0 +1,12 @@
+{if;{userid};==;170915625722576896;
+	{if;{regextest;{text};/'s Adventure|Party Adventure/gmi};
+		{set;~username;{pop;{regexmatch;{shift;{regexmatch;{text};/(\w+) has [\d,]+\/[\d,]+ HP left\./gmi}};/(\w+) has [\d,]+\/[\d,]+ HP left\./mi}}}
+		{if;{jget;!_{get;~username}#!adv;time};<;{math;+;{time;x};5000};
+			{if;{get;_{jget;_{get;~username}#!adv;id}#!adv.msg};!=;;
+				{delete;{jget;_{jget;_{get;~username}#!adv;id}#!adv.msg;channel};{jget;_{jget;_{get;~username}#!adv;id}#!adv.msg;message}}
+			}
+		{exec;drpg;lvl;{jget;_{get;~username}#!adv;id}}
+		{set;_{jget;_{get;~username}#!adv;id}#!adv.msg;{jset;{jset;;message;{get;~outputID}};channel;{channelid}}}
+		}
+	}
+}
