@@ -1,0 +1,106 @@
+{if;{logic;||;{bool;{lower;{args;0}};==;help};{flagset;h}};
+  {//;drpg help <sub-tag> OR drpg -h <sub-tag>}
+  {if;{argslength};>;1;
+    {exec;drpg;{args;1};help}
+    {return;false}
+  ;
+    {if;{length;{flag;h}};>;0;
+      {exec;drpg;{flag;h};help}
+      {return;false}
+    }
+  }
+
+  {embed;{buildembed;title:List of useful drpg tags;
+  color:{exec;dcolor};
+  fields.name:Usage;
+  fields.value:{unindent;
+    `b!t drpg <sub-tag> [args]`
+    `<sub-tag>` can be any of the sub-tags specified below, and `[args]` depends on the sub-tag used.
+
+    There is a special `sub-tag` (`shortcut`) which overwrites the default behaviour of `b!t drpg` if it's provided a non-existent sub-tag. Example:
+    - `b!t drpg Dx8pi`
+
+    Instead of returning "Unrecognized sub-tag `Dx8pi`", this will instead execute the configured sub-tag with the provided arguments. This **only** works if the first argument is an invalid sub-tag. So `b!t drpg lvl` will not work.
+  };
+  fields.name:Sub-tags;
+  fields.value:{unindent;
+    *Displays user level and required XP:*
+    - `b!t drpg level [user]` or
+    - `b!t drpg lvl` (alias of `b!t drpg.level`)
+
+    *Displays pet level and required XP:*
+    - `b!t drpg pet [user]` or
+    - `b!t drpg p [user]` (alias of `b!t drpg.pet`)
+
+    *Displays or changes the configured shortcut:*
+    - `b!t drpg shortcut [newshortcut]`
+
+    For info on a sub-tag use `b!t drpg <sub-tag> help` or `b!t drpg help <sub-tag>`
+    **Special thanks to Dx8pi for creating `b!t nlvl` and `b!t petlvl`**
+  }}}
+{return;false}
+}
+{if;{argslength};>;1;
+    {set;~args;{args;1;n}}
+;
+    {//;Nothing}
+}
+{switch;{lower;{args;0}};
+  ["lvl","level"];
+    {exec;drpg.level;{get;~args}}
+    {return;false}
+  ;["p","pet"];
+    {exec;drpg.petlvl;{get;~args}}
+    {return;false}
+  ;shortcut;
+    {set;~shortcuts;lvl;level;p;pet}
+    {if;{get;~args};==;;
+      {embed;{buildembed;
+        title:Drpg shortcut;
+        description:{unindent;
+          {if;{get;@drpg.shortcut.{userid}};==;;
+            No shortcut configured
+          ;
+            Your current shortcut is set to `{get;@drpg.shortcut.{userid}}`
+          }
+
+          To change the shortcut use `b!t drpg shortcut [newshortcut]`, like `b!t drpg shortcut lvl`.
+          To reset the shortcut use `b!t drpg shortcut reset`
+        };
+        color:{exec;dcolor}
+      }}
+      {return;false}
+    }
+
+    {if;{lower;{get;~args}};==;reset;
+      {set;@drpg.shortcut.{userid}}
+      Reset your shortcut!
+      {return;false}
+    }
+
+    {if;{get;~shortcuts};includes;{lower;{get;~args}};
+      {set;@drpg.shortcut.{userid};{lower;{get;~args}}}
+      Set shortcut to `{lower;{get;~args}}`
+      {return;false}
+    ;
+      `{lower;{get;~args}}` is not a valid sub-tag, please pick one from `{join;{get;~shortcuts};,{space}}`.
+      {return;false}
+    }
+  ;
+    {if;{get;@drpg.shortcut.{userid}};!=;;
+      {if;{argslength};>;0;
+        {set;~args;{args;0;n}}
+      ;
+        {//;Nothing}
+      }
+
+      {exec;drpg;{get;@drpg.shortcut.{userid}};{get;~args}}
+      {return;false}
+    }
+    {if;{argslength};==;0;
+      {exec;drpg;help}
+    ;
+      Unrecognized sub-tag `{args;0}`
+    }
+  {return;false}
+}
