@@ -52,8 +52,32 @@ For example `{prefix}t drpg pet {username}` or `{prefix}t drpg {userid}` will di
 ;
     {set;~pimg;https://api.nicelink.xyz/jimp/59dd74e3-beb6-4cc4-97dd-317cf9b9172f.png}
 }
-{function;getBase;{if;{logic;&&;{bool;>=;{get;~plvl};5};{bool;<=;{get;~plvl};29}};==;true;{set;~base;35};{if;{logic;&&;{bool;>=;{get;~plvl};30};{bool;<=;{get;~plvl};44}};==;true;{set;~base;45};{if;{logic;&&;{bool;>=;{get;~plvl};45};{bool;<=;{get;~plvl};89}};==;true;{set;~base;55};{if;{logic;&&;{bool;>=;{get;~plvl};90};{bool;<=;{get;~plvl};99}};==;true;{set;~base;70};{if;{logic;&&;{bool;>=;{get;~plvl};100};{bool;<=;{get;~plvl};149}};==;true;{set;~base;95};{if;{logic;&&;{bool;>=;{get;~plvl};150};{bool;<=;{get;~plvl};199}};==;true;{set;~base;120};{if;{logic;&&;{bool;>=;{get;~plvl};200};{bool;<=;{get;~plvl};299}};==;true;{set;~base;145};{if;{logic;&&;{bool;>=;{get;~plvl};300};{bool;<=;{get;~plvl};499}};==;true;{set;~base;170};{if;{logic;&&;{bool;>=;{get;~plvl};500};{bool;<=;{get;~plvl};599}};==;true;{set;~base;195};{set;~base;220}}}}}}}}}}}
-{set;~base;20}
+{function;getBase;
+	{switch;true;
+		{logic;&&;{bool;>=;{get;~plvl};5};{bool;<=;{get;~plvl};29}};
+			{set;~base;35};
+		{logic;&&;{bool;>=;{get;~plvl};30};{bool;<=;{get;~plvl};44}};
+			{set;~base;45};
+		{logic;&&;{bool;>=;{get;~plvl};45};{bool;<=;{get;~plvl};89}};
+			{set;~base;55};
+		{logic;&&;{bool;>=;{get;~plvl};90};{bool;<=;{get;~plvl};99}};
+			{set;~base;70};
+		{logic;&&;{bool;>=;{get;~plvl};100};{bool;<=;{get;~plvl};149}};
+			{set;~base;95};
+		{logic;&&;{bool;>=;{get;~plvl};150};{bool;<=;{get;~plvl};199}};
+			{set;~base;120};
+		{logic;&&;{bool;>=;{get;~plvl};200};{bool;<=;{get;~plvl};299}};
+			{set;~base;145};
+		{logic;&&;{bool;>=;{get;~plvl};300};{bool;<=;{get;~plvl};499}};
+			{set;~base;170};
+		{logic;&&;{bool;>=;{get;~plvl};500};{bool;<=;{get;~plvl};599}};
+			{set;~base;195};
+		{bool;{get;~plvl};>=;600};
+			{set;~base;220};
+		{//;Default}
+			{set;~base;20}
+	}
+}
 
 {func.getBase}
 {set;~currentbase;{math;*;{get;~base};{get;~plvl};{math;+;{get;~plvl};1}}}
