@@ -99,16 +99,15 @@ Realbase : 1 / ((nextbaselvl-currentbaselvl) / (nextbase/currentbase)) * (curren
 {set;~percent;{max;0;{min;100;{get;~percent}}}}
 
 {edit;{channelid};{get;~outputID};{space};{buildembed;
-author.icon_url:{useravatar;{get;~user}};
-author.name:{username;{get;~user}};
-title:Level of {username;{get;~user}}#{userdiscrim;{get;~user}};
-description:{repeat;`;3}md{newline}# Current level
-{get;~userlvl}
-> - <
-# XP
-{numformat;{get;~userXP};;;,} / {numformat;{get;~requiredXP};;;,} ( {numformat;{math;-;{get;~requiredXP};{get;~userXP}};;;,} XP left )
-{repeat;`;3};
+title:{username;{get;~user}}#{userdiscrim;{get;~user}};
+fields.name:Level;
+fields.value:{get;~userlvl};
+fields.inline:true;
+fields.name:XP;
+fields.value:{numformat;{get;~userXP};;;,} / {numformat;{get;~requiredXP};;;,} ( {numformat;{math;-;{get;~requiredXP};{get;~userXP}};;;,} XP left );
+fields.inline:true;
 image.url:{exec;progressbar;{get;~percent};-c;{exec;dcolor;{get;~user}}};
 color:{exec;dcolor;{get;~user}};
+thumbnail.url:{useravatar;{get;~user}};
 footer.text:{numformat;{get;~percent};2}%
 }}

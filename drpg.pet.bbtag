@@ -1,12 +1,12 @@
 {if;{args};==;help;
     {embed;{buildembed;
-        title:Help for drpg petlvl;
+        title:Help for drpg pet;
         description:{unindent;
             This tag allows you to display the level your or someone else's pet.
             Inspired by `b!t petlvl` and made by RagingLink#9469
         };
         fields.name:Usage;
-        fields.value:`b!t drpg petlvl [user]`, where `[user]` can be a username, id or mention.;
+        fields.value:`b!t drpg pet [user]`, where `[user]` can be a username, id or mention.;
         color:{exec;dcolor}
     }}
     {return;false}
@@ -18,9 +18,9 @@
 {if;{argslength};!=;0;
   {set;~user;{userid;{args}}}
   {if;{get;~user};==;;Not a valid user. Try
-`{prefix}t drpg petlvl` for your own pets' lvl.
-`{prefix}t drpg petlvl [any username/userID]` for someone else's pets' lvl.
-For example `{prefix}t drpg pet {username}` or `{prefix}t drpg {userid}` will display your own pets' lvl, just switch those with whatever username/userID you wanna see.
+`{prefix}t drpg petlvl` for your own pets' info.
+`{prefix}t drpg petlvl [any username/userID]` for someone else's pets' info.
+For example `{prefix}t drpg pet {username}` or `{prefix}t drpg pet {userid}` will display your own pets' info, just switch those with whatever username/userID you wanna see.
 {return;false}}
 }
 
@@ -91,7 +91,7 @@ For example `{prefix}t drpg pet {username}` or `{prefix}t drpg {userid}` will di
 {set;~percent;{min;100;{max;0;{get;~percent}}}}
 
 {edit;{channelid};{get;~outputID};{space};{embedbuild;
-title:Level of {get;~pname};
+title:Info of {get;~pname};
 author.icon_url:{useravatar;{get;~user}};
 author.name:{username;{get;~user}}#{userdiscrim;{get;~user}};
 color:{exec;dcolor;{get;~user}};
@@ -99,9 +99,20 @@ thumbnail.url:{get;~pimg};
 fields.name:Level;
 fields.value:{get;~plvl};
 fields.inline:true;
+fields.name:HP;
+fields.value:{jget;~body;data.pet.hp} / {jget;~body;data.pet.maxhp};
+fields.inline:true;
+fields.name:Damage;
+fields.value:{jget;~body;data.pet.damage.min}-{jget;~body;data.pet.damage.max};
+fields.inline:true;
+fields.name:Type;
+fields.value:{jget;~body;data.pet.type};
+fields.inline:true;
+fields.name:XP rate;
+fields.value:{jget;~body;data.pet.xprate}%;
+fields.inline:true;
 fields.name:XP;
 fields.value:{numformat;{get;~pxp};;;,} / {numformat;{get;~currentbase};;;,} ( {numformat;{math;-;{get;~currentbase};{get;~pxp}};;;,} XP left );
-fields.inline:true;
 image.url:{exec;progressbar;{get;~percent};-c;{exec;dcolor;{get;~user}}};
 footer.text:{numformat;{get;~percent};2}%
 }}

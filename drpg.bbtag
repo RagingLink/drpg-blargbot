@@ -28,9 +28,13 @@
     - `b!t drpg level [user]` or
     - `b!t drpg lvl` (alias of `b!t drpg.level`)
 
+    *Displays pet info and required XP:*
+    - `b!t drpg p [user]` or
+    - `b!t drpg pet [user]`
+
     *Displays pet level and required XP:*
-    - `b!t drpg pet [user]` or
-    - `b!t drpg p [user]` (alias of `b!t drpg.pet`)
+    - `b!t drpg plvl [user]` or
+    - `b!t drpg petlvl [user]` (alias of `b!t drpg.petlvl`)
 
     *Displays or changes the configured shortcut:*
     - `b!t drpg shortcut [newshortcut]`
@@ -49,11 +53,14 @@
   ["lvl","level"];
     {exec;drpg.level;{get;~args}}
     {return;false}
-  ;["p","pet"];
+  ;["plvl","petlvl","petlevel","plevel"];
     {exec;drpg.petlvl;{get;~args}}
     {return;false}
+  ;["pet","p"];
+    {exec;drpg.pet;{get;~args}}
+    {return;false}
   ;shortcut;
-    {set;~shortcuts;lvl;level;p;pet}
+    {set;~shortcuts;lvl;level;p;plvl;petlvl;petlevel;plevel;pet}
     {if;{get;~args};==;;
       {embed;{buildembed;
         title:Drpg shortcut;
