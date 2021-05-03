@@ -1,0 +1,114 @@
+{if;{args};==;help;
+  {embed;{buildembed;
+    title:Help for drpg level;
+    color:{exec;dcolor};
+    description:This tag allows you to display your level or the level of someone else. This is inspired by `b!t nlvl` from Dx8pi.;
+    fields.name:Usage;
+    fields.value:`{prefix}t drpg lvl [user]`. `[user]` is optional, and can be a userID, username or mention.
+For example `{prefix}t drpg lvl {username}` or `{prefix}t drpg lvl {userid}` will display your own info, just switch those with whatever username/userID you wanna stalk.
+  }}
+{return;false}
+}
+{suppresslookup}
+{set;~user;{userid}}
+{if;{argslength};!=;0;
+  {set;~user;{userid;{args}}}
+  {if;{get;~user};==;;Not a valid user. Try
+`{prefix}t {commandname}` for your own info.
+`{prefix}t {commandname} (any username/userID)` for someone else's info.
+For example `{prefix}t {commandname} {username}` or `{prefix}t {commandname} {userid}` will display your own info, just switch those with whatever username/userID you wanna see.
+{return;false}}
+}
+
+{set;~outputID;{output;Loading level records{exec;loading;11}}}
+{//;API init}
+{set;~api-url;https://api.discorddungeons.me/v3}
+{set;~api-key;{get;@drpg.level-key}}
+{set;~options;
+  {inject;{lb}json{semi}
+    {lb}
+      "method" : "GET",
+      "headers" : {lb}
+        "Authorization" : "{get;~api-key}"
+      {rb}
+    {rb}
+  {rb}
+}}
+{set;~body;{jget;{request;{get;~api-url}/user/{get;~user};{get;~options}};body}}
+{if;{jget;~body;data};==;;
+  {edit;{channelid};{get;~outputID};I don't know anything about {username;{get;~user}}...}
+  {return;false}
+}
+{set;~userXP;{jget;{get;~body};data.xp}}
+{set;~userlvl;{jget;{get;~body};data.level}}
+
+
+{exec;lvljson}
+
+{set;~currentBase;{pop;{filter;~i;{jsonkeys;{get;~lvljson}};{bool;{get;~i};<=;{get;~userlvl}}}}}
+{set;~nextBase;{jget;{jsonkeys;~lvljson};{math;+;{indexof;{jsonkeys;~lvljson};{get;~currentBase}};1}}}
+
+{set;~previousBase;{pop;{filter;~i;{jsonkeys;~lvljson};{bool;{get;~i};<=;{math;-;{get;~userlvl};1}}}}}
+{set;~previousNextBase;{jget;{jsonkeys;~lvljson};{math;+;{indexof;{jsonkeys;~lvljson};{get;~previousBase}};1}}}
+
+
+{//;XP stuff
+Realbase : 1 / ((nextbaselvl-currentbaselvl) / (nextbase/currentbase)) * (currentlvl-currentbaselvl) + currentbase
+}
+{set;~realBase;
+  {math;+;
+    {math;*;
+      {math;/;1;
+        {math;/;
+          {math;-;{get;~nextBase};{get;~currentBase}};
+          {math;-;{jget;~lvljson;{get;~nextBase}};{jget;~lvljson;{get;~currentBase}}}
+        }
+      };
+      {math;-;{get;~userlvl};{get;~currentBase}}};
+    {jget;~lvljson;{get;~currentBase}}
+  }
+}
+{set;~previousRealBase;
+  {math;+;
+    {math;*;
+      {math;/;1;
+        {math;/;
+          {math;-;{get;~previousNextBase};{get;~previousBase}};
+          {math;-;{jget;~lvljson;{get;~previousNextBase}};{jget;~lvljson;{get;~previousBase}}}
+        }
+      };
+      {math;-;{math;-;{get;~userlvl};1};{get;~previousBase}}};
+    {jget;~lvljson;{get;~previousBase}}
+  }
+}
+
+{set;~requiredXP;{rounddown;{math;*;{get;~realBase};{get;~userlvl};{math;+;{get;~userlvl};1}}}}
+{set;~previousRequiredXP;{rounddown;{math;*;{get;~previousRealBase};{get;~userlvl};{math;-;{get;~userlvl};1}}}}
+
+{if;{args;0};==;admin;
+  {if;{userid};==;278237925009784832;
+    {if;{get;~userlvl};==;1;
+      {set;~userXP;0};
+      {set;~userXP;{get;~previousRequiredXP}}
+    }
+  }
+}
+
+{set;~percent;{numformat;{math;/;{math;-;{get;~userXP};{get;~previousRequiredXP}};{math;-;{get;~requiredXP};{get;~previousRequiredXP}};0.01};5}}
+
+{set;~percent;{max;0;{min;100;{get;~percent}}}}
+
+{edit;{channelid};{get;~outputID};{space};{buildembed;
+author.icon_url:{useravatar;{get;~user}};
+author.name:{username;{get;~user}};
+title:Level of {username;{get;~user}}#{userdiscrim;{get;~user}};
+description:{repeat;`;3}md{newline}# Current level
+{get;~userlvl}
+> - <
+# XP
+{numformat;{get;~userXP};;;,} / {numformat;{get;~requiredXP};;;,} ( {numformat;{math;-;{get;~requiredXP};{get;~userXP}};;;,} XP left )
+{repeat;`;3};
+image.url:{exec;progressbar;{get;~percent};-c;{exec;dcolor;{get;~user}}};
+color:{exec;dcolor;{get;~user}};
+footer.text:{numformat;{get;~percent};2}%
+}}
