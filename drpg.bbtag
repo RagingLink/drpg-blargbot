@@ -17,10 +17,6 @@
     `b!t drpg <sub-tag> [args]`
     `<sub-tag>` can be any of the sub-tags specified below, and `[args]` depends on the sub-tag used.
 
-    There is a special `sub-tag` (`shortcut`) which overwrites the default behaviour of `b!t drpg` if it's provided a non-existent sub-tag. Example:
-    - `b!t drpg Dx8pi`
-
-    Instead of returning "Unrecognized sub-tag `Dx8pi`", this will instead execute the configured sub-tag with the provided arguments. This **only** works if the first argument is an invalid sub-tag. So `b!t drpg lvl` will not work.
   };
   fields.name:Sub-tags;
   fields.value:{unindent;
@@ -37,7 +33,7 @@
     - `b!t drpg petlvl [user]` (alias of `b!t drpg.petlvl`)
 
     *Displays or changes the configured shortcut:*
-    - `b!t drpg shortcut [newshortcut]`
+    - `b!t drpg shortcut [newshortcut] [appendArgs]`
 
     For info on a sub-tag use `b!t drpg <sub-tag> help` or `b!t drpg help <sub-tag>`
     **Special thanks to Dx8pi for creating `b!t nlvl` and `b!t petlvl`**
@@ -71,7 +67,8 @@
             Your current shortcut is set to `{get;@drpg.shortcut.{userid}}`
           }
 
-          To change the shortcut use `b!t drpg shortcut [newshortcut]`, like `b!t drpg shortcut lvl`.
+          To change the shortcut use `b!t drpg shortcut <newshortcut> [appendArgs]`, like `b!t drpg shortcut lvl`.
+          `[appendArgs]` will be appended to the arguments of the tag (`b!t drpg shortcut lvl RagingLink` will always return the level of RagingLink).
           To reset the shortcut use `b!t drpg shortcut reset`
         };
         color:{exec;dcolor}
@@ -81,16 +78,22 @@
 
     {if;{lower;{get;~args}};==;reset;
       {set;@drpg.shortcut.{userid}}
+      {set;@drpg.shortcut.args.{userid}}
       Reset your shortcut!
       {return;false}
     }
 
-    {if;{get;~shortcuts};includes;{lower;{get;~args}};
-      {set;@drpg.shortcut.{userid};{lower;{get;~args}}}
-      Set shortcut to `{lower;{get;~args}}`
+    {if;{get;~shortcuts};includes;{lower;{args;1}};
+      {set;@drpg.shortcut.{userid};{lower;{args;1}}}
+      {if;{argslength};>;2;
+        {set;@drpg.shortcut.args.{userid};{args;2;n}}
+      ;
+        {set;@drpg.shortcut.args.{userid}}
+      }
+      Set shortcut to `{lower;{args;1}}` {if;{get;@drpg.shortcut.args.{userid}};!=;;with `{get;@drpg.shortcut.args.{userid}}` as appended arguments}
       {return;false}
     ;
-      `{lower;{get;~args}}` is not a valid sub-tag, please pick one from `{join;{get;~shortcuts};,{space}}`.
+      `{lower;{args;0}}` is not a valid sub-tag, please pick one from `{join;{get;~shortcuts};,{space}}`.
       {return;false}
     }
   ;
@@ -101,7 +104,7 @@
         {//;Nothing}
       }
 
-      {exec;drpg;{get;@drpg.shortcut.{userid}};{get;~args}}
+      {exec;drpg;{get;@drpg.shortcut.{userid}};{trim;{get;~args}{space}{get;@drpg.shortcut.args.{userid}}}}
       {return;false}
     }
     {if;{argslength};==;0;
