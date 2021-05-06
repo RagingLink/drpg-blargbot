@@ -16,7 +16,7 @@
 {set;~user;{userid}}
 
 {if;{argslength};!=;0;
-  {set;~user;{userid;{args}}}
+  {set;~user;{userid;{flag;_}}}
   {if;{get;~user};==;;Not a valid user. Try
 `{prefix}t drpg petlvl` for your own pets' lvl.
 `{prefix}t drpg petlvl [any username/userID]` for someone else's pets' lvl.
@@ -87,7 +87,11 @@ For example `{prefix}t drpg pet {username}` or `{prefix}t drpg {userid}` will di
 {func.getBase}
 {set;~lastbase;{math;*;{get;~base};{get;~plvl};{math;+;{get;~plvl};1}}}
 {void;{increment;~plvl}}
-{set;~percent;{numformat;{math;*;{math;/;{math;-;{get;~pxp};{get;~lastbase}};{math;-;{get;~currentbase};{get;~lastbase}}};100};5}}
+{if;{flagset;f};
+  {set;~percent;{math;/;{get;~pxp};{get;~currentbase};0.01}}
+;
+  {set;~percent;{math;*;{math;/;{math;-;{get;~pxp};{get;~lastbase}};{math;-;{get;~currentbase};{get;~lastbase}}};100}}
+}
 {set;~percent;{min;100;{max;0;{get;~percent}}}}
 
 {edit;{channelid};{get;~outputID};{space};{embedbuild;

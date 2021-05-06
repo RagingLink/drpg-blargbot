@@ -12,7 +12,7 @@ For example `{prefix}t drpg lvl {username}` or `{prefix}t drpg lvl {userid}` wil
 {suppresslookup}
 {set;~user;{userid}}
 {if;{argslength};!=;0;
-  {set;~user;{userid;{args}}}
+  {set;~user;{userid;{flag;_}}}
   {if;{get;~user};==;;Not a valid user. Try
 `{prefix}t {commandname}` for your own info.
 `{prefix}t {commandname} (any username/userID)` for someone else's info.
@@ -94,7 +94,11 @@ Realbase : 1 / ((nextbaselvl-currentbaselvl) / (nextbase/currentbase)) * (curren
   }
 }
 
-{set;~percent;{numformat;{math;/;{math;-;{get;~userXP};{get;~previousRequiredXP}};{math;-;{get;~requiredXP};{get;~previousRequiredXP}};0.01};5}}
+{if;{flagset;f};
+  {set;~percent;{math;/;{get;~userXP};{get;~requiredXP};0.01}}
+;
+  {set;~percent;{math;/;{math;-;{get;~userXP};{get;~previousRequiredXP}};{math;-;{get;~requiredXP};{get;~previousRequiredXP}};0.01}}
+}
 
 {set;~percent;{max;0;{min;100;{get;~percent}}}}
 
